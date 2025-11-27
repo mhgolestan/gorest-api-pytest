@@ -3,4 +3,6 @@ httpx
 allure-pytest
 jsonschema
 pydantic 
+pydantic_settings
 python-dotenv
+faker
