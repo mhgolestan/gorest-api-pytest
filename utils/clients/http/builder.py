@@ -13,14 +13,14 @@ def get_http_client(
 
     headers: dict[str, str] = {}
 
-    client = HTTPClient(base_url=base_settings.api_url)
-    authentication_client = AuthenticationClient(client=client)
+    # client = HTTPClient(base_url=base_settings.api_url)
+    # authentication_client = AuthenticationClient(client=client)
+    headers = {**headers, 'Authorization': f'Bearer {auth.user.token}'}
+    # if (not auth.auth_token) and auth.user:
+    #     token = authentication_client.get_auth_token(auth.user.token)
+    #     headers = {**headers, 'Authorization': f'Bearer {token}'}
 
-    if (not auth.auth_token) and auth.user:
-        token = authentication_client.get_auth_token(auth.user)
-        headers = {**headers, 'Authorization': f'Bearer {token}'}
-
-    if auth.auth_token and (not auth.user):
-        headers = {**headers, 'Authorization': f'Bearer {auth.auth_token}'}
+    # if auth.auth_token and (not auth.user):
+    #     headers = {**headers, 'Authorization': f'Bearer {auth.auth_token}'}
 
     return HTTPClient(base_url=base_url, headers=headers, trust_env=True)
