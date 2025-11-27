@@ -1,0 +1,6 @@
+pytest
+httpx
+allure-pytest
+jsonschema
+pydantic 
+python-dotenv
