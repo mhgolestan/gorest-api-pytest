@@ -6,3 +6,5 @@ pydantic
 pydantic_settings
 python-dotenv
 faker
+pytest-cov
+pytest-xdist
