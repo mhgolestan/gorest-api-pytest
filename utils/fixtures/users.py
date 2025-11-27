@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from base.api.users_api import UsersClient
 from models.authentication import Authentication
@@ -18,3 +19,9 @@ def function_user(class_users_client: UsersClient) -> DefaultUser:
     yield user
 
     class_users_client.delete_user_api(user.id)
+
+@pytest.fixture(autouse=True)
+def rate_limit_delay():
+    """Add delay between tests to avoid rate limiting"""
+    yield
+    time.sleep(0.5)
