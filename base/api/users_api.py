@@ -18,7 +18,11 @@ class UsersClient(APIClient):
     @allure.step('Creating user')
     def create_user_api(self, payload: DefaultUser) -> Response:
         return self.client.post(APIRoutes.USERS, json=payload.model_dump(by_alias=True))
-
+    
+    @allure.step('Creating user with raw payload')
+    def create_user_api_raw(self, payload: dict) -> Response:
+        return self.client.post(APIRoutes.USERS, json=payload)
+    
     @allure.step('Updating user with id "{user_id}"')
     def update_user_api(self, user_id: int, payload: UpdateUser) -> Response:
         return self.client.patch(
