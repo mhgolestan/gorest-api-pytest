@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     )
 
     base_url: str
-    test_user_token: str
+    test_user_token: str = Field(validation_alias='TEST_USER_TOKEN')
 
     @property
     def api_url(self) -> str:
