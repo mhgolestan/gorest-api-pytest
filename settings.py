@@ -14,8 +14,8 @@ class Settings(BaseSettings):
         case_sensitive=False
     )
 
-    base_url: str = Field(default="")
-    test_user_token: str = Field(default="")
+    base_url: str = Field(default=os.getenv('BASE_URL', ''))
+    test_user_token: str = Field(default=os.getenv('TEST_USER_TOKEN', ''))
 
     @property
     def api_url(self) -> str:
