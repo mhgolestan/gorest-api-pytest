@@ -1,0 +1,2 @@
+def create_user(self) id=411 name='06H71ThCH7kR96' email='hannah90@example.org' gender='male' status='inactive'
+APIRoutes.USERS /users
