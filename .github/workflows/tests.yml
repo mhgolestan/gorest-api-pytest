@@ -25,8 +25,8 @@ jobs:
 
     - name: Run tests with Allure
       env:
-        BASE_URL: ${{ secrets.BASE_URL }}
-        TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
+        base_url: ${{ secrets.BASE_URL }}
+        test_user_token: ${{ secrets.TEST_USER_TOKEN }}
       run: python3 -m pytest --alluredir=./allure-results -n auto --tb=short
 
     - name: Generate Allure Report
