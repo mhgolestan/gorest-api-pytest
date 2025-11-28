@@ -1,4 +1,5 @@
 from http import HTTPStatus
+import os
 
 import allure
 import pytest
@@ -66,6 +67,7 @@ class TestTodos:
                          todo_payload: dict,
                          expected_status: HTTPStatus):
         
+        print("def test_create_todo_negative", os.getenv('BASE_URL'))
         response = class_todos_client.create_todo_api_raw(function_user.id, todo_payload)
 
         assert_status_code(response.status_code, expected_status) 

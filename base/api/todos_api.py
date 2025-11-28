@@ -21,6 +21,7 @@ class TodosClient(APIClient):
     
     @allure.step('Creating todo for user "{user_id}" with raw payload')
     def create_todo_api_raw(self, user_id: int, payload: dict) -> Response:
+        
         return self.client.post(f'{APIRoutes.USERS}/{user_id}/todos', json=payload)
     
     def create_todo(self, user_id: int) -> DefaultTodo:
