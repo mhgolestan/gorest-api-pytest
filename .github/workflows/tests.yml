@@ -29,7 +29,9 @@ jobs:
         TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
       run: |
         echo "BASE_URL set: ${BASE_URL:+yes}"
-        echo "TEST_USER_TOKEN set: ${TEST_USER_TOKEN}"
+        echo "TEST_USER_TOKEN set: ${TEST_USER_TOKEN:+yes}"
+        echo "BASE_URL value: $BASE_URL"
+        echo "TEST_USER_TOKEN value: $TEST_USER_TOKEN"
         if [ -z "$BASE_URL" ] || [ -z "$TEST_USER_TOKEN" ]; then
           echo "ERROR: Please set repository secrets BASE_URL and TEST_USER_TOKEN"; exit 1
         fi
