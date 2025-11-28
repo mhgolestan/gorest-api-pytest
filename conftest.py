@@ -63,6 +63,47 @@ def mock_api_if_needed(request):
     with respx.mock(assert_all_called=False) as respx_mock:
         base_url = base_settings.api_url
         
+        # === POSTS ROUTES (more specific, must come first) ===
+        # Mock GET /posts
+        respx_mock.get(f"{base_url}posts").mock(return_value=httpx.Response(
+            200,
+            json=[
+                {"id": 1, "user_id": 1, "title": "Test Post", "body": "Test body content"},
+                {"id": 2, "user_id": 1, "title": "Another Post", "body": "More content"},
+            ]
+        ))
+        
+        # Mock GET /users/{id}/posts - MUST come before /users/{id}
+        respx_mock.get(url__regex=rf"{base_url}users/\d+/posts$").mock(return_value=httpx.Response(
+            200,
+            json=[{"id": 1, "user_id": 1, "title": "Test Post", "body": "Test body content"}]
+        ))
+        
+        # Mock POST /users/{id}/posts
+        respx_mock.post(url__regex=rf"{base_url}users/\d+/posts$").mock(side_effect=_mock_create_post)
+        
+        # === TODOS ROUTES (more specific, must come first) ===
+        # Mock GET /todos
+        respx_mock.get(f"{base_url}todos").mock(return_value=httpx.Response(
+            200,
+            json=[
+                {"id": 1, "user_id": 1, "title": "Test Todo", "due_on": "2024-12-31T23:59:59.000+05:30", "status": "pending"},
+            ]
+        ))
+        
+        # Mock GET /users/{id}/todos - MUST come before /users/{id}
+        respx_mock.get(url__regex=rf"{base_url}users/\d+/todos$").mock(return_value=httpx.Response(
+            200,
+            json=[{"id": 1, "user_id": 1, "title": "Test Todo", "due_on": "2024-12-31T23:59:59.000+05:30", "status": "pending"}]
+        ))
+        
+        # Mock POST /users/{id}/todos
+        respx_mock.post(url__regex=rf"{base_url}users/\d+/todos$").mock(side_effect=_mock_create_todo)
+        
+        # Mock DELETE /users/{id}/todos/{id}
+        respx_mock.delete(url__regex=rf"{base_url}users/\d+/todos/\d+$").mock(return_value=httpx.Response(204))
+        
+        # === USERS ROUTES (less specific, must come last) ===
         # Mock GET /users
         respx_mock.get(f"{base_url}users").mock(return_value=httpx.Response(
             200,
@@ -73,54 +114,16 @@ def mock_api_if_needed(request):
         ))
         
         # Mock GET /users/{id} - handle all cases including SQL injection attempts
-        respx_mock.get(url__regex=rf"{base_url}users/.*$").mock(side_effect=_mock_get_user)
+        respx_mock.get(url__regex=rf"{base_url}users/[^/]+$").mock(side_effect=_mock_get_user)
         
         # Mock POST /users - success
         respx_mock.post(f"{base_url}users").mock(side_effect=_mock_create_user)
         
         # Mock PATCH /users/{id} - handle all cases
-        respx_mock.patch(url__regex=rf"{base_url}users/.*$").mock(side_effect=_mock_update_user)
+        respx_mock.patch(url__regex=rf"{base_url}users/[^/]+$").mock(side_effect=_mock_update_user)
         
         # Mock DELETE /users/{id} - handle all cases
-        respx_mock.delete(url__regex=rf"{base_url}users/.*$").mock(side_effect=_mock_delete_user)
-        
-        # Mock GET /posts
-        respx_mock.get(f"{base_url}posts").mock(return_value=httpx.Response(
-            200,
-            json=[
-                {"id": 1, "user_id": 1, "title": "Test Post", "body": "Test body content"},
-                {"id": 2, "user_id": 1, "title": "Another Post", "body": "More content"},
-            ]
-        ))
-        
-        # Mock GET /users/{id}/posts
-        respx_mock.get(url__regex=rf"{base_url}users/\d+/posts").mock(return_value=httpx.Response(
-            200,
-            json=[{"id": 1, "user_id": 1, "title": "Test Post", "body": "Test body content"}]
-        ))
-        
-        # Mock POST /users/{id}/posts
-        respx_mock.post(url__regex=rf"{base_url}users/\d+/posts").mock(side_effect=_mock_create_post)
-        
-        # Mock GET /todos
-        respx_mock.get(f"{base_url}todos").mock(return_value=httpx.Response(
-            200,
-            json=[
-                {"id": 1, "user_id": 1, "title": "Test Todo", "due_on": "2024-12-31T23:59:59.000+05:30", "status": "pending"},
-            ]
-        ))
-        
-        # Mock GET /users/{id}/todos
-        respx_mock.get(url__regex=rf"{base_url}users/\d+/todos").mock(return_value=httpx.Response(
-            200,
-            json=[{"id": 1, "user_id": 1, "title": "Test Todo", "due_on": "2024-12-31T23:59:59.000+05:30", "status": "pending"}]
-        ))
-        
-        # Mock POST /users/{id}/todos
-        respx_mock.post(url__regex=rf"{base_url}users/\d+/todos").mock(side_effect=_mock_create_todo)
-        
-        # Mock DELETE /users/{id}/todos/{id}
-        respx_mock.delete(url__regex=rf"{base_url}users/\d+/todos/\d+").mock(return_value=httpx.Response(204))
+        respx_mock.delete(url__regex=rf"{base_url}users/[^/]+$").mock(side_effect=_mock_delete_user)
         
         yield respx_mock
 
