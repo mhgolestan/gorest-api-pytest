@@ -8,3 +8,5 @@ python-dotenv
 faker
 pytest-cov
 pytest-xdist
+pytest-httpx
+respx

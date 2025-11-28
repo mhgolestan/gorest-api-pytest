@@ -30,32 +30,17 @@ jobs:
       run: |
         echo "BASE_URL set: ${BASE_URL:+yes}"
         echo "TEST_USER_TOKEN set: ${TEST_USER_TOKEN:+yes}"
-        echo "BASE_URL value: $BASE_URL"
-        echo "TEST_USER_TOKEN value: $TEST_USER_TOKEN"
         if [ -z "$BASE_URL" ] || [ -z "$TEST_USER_TOKEN" ]; then
-          echo "ERROR: Please set repository secrets BASE_URL and TEST_USER_TOKEN"; exit 1
+          echo "ERROR: Please set repository secrets BASE_URL and TEST_USER_TOKEN"
+          exit 1
         fi
-
-    - name: Debug Python Settings
-      env:
-        BASE_URL: ${{ secrets.BASE_URL }}
-        TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
-      run: |
-        python3 -c "from settings import base_settings; print('base_url:', repr(base_settings.base_url)); print('token_len:', len(base_settings.test_user_token)); print('api_url:', repr(base_settings.api_url))"
-        python3 -c "from models.authentication import Authentication; a = Authentication(); print('auth token_len:', len(a.user.token) if a.user.token else 0)"
-
-    - name: Test API Connection
-      env:
-        BASE_URL: ${{ secrets.BASE_URL }}
-        TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
-      run: |
-        python3 -c "import httpx; from settings import base_settings; headers = {'Authorization': 'Bearer ' + base_settings.test_user_token}; resp = httpx.get(base_settings.api_url + 'posts', headers=headers); print('Status:', resp.status_code); print('Response:', resp.text[:500] if resp.text else 'EMPTY')"
 
     - name: Run tests with Allure
       env:
         BASE_URL: ${{ secrets.BASE_URL }}
         TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
-      run: python3 -m pytest --alluredir=./allure-results -x
+        CI: true
+      run: python3 -m pytest --alluredir=./allure-results -v
 
     # - name: Generate Allure Report
     #   if: always()
