@@ -29,6 +29,12 @@ jobs:
         echo "BASE_URL secret: ${{ secrets.BASE_URL != '' }}"
       env:
         base_url: ${{ secrets.BASE_URL }}
+    
+    - name: Debug Token
+      run: |
+        echo "TEST_USER_TOKEN secret: ${{ secrets.TEST_USER_TOKEN != '' }}"
+      env:
+        test_user_token: ${{ secrets.TEST_USER_TOKEN }}
 
     - name: Run tests with Allure
       env:
