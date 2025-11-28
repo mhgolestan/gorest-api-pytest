@@ -23,23 +23,35 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Debug BASE_URL
-      run: |
-        echo "BASE_URL is: $base_url"
-        echo "BASE_URL secret: ${{ secrets.BASE_URL != '' }}"
-      env:
-        base_url: ${{ secrets.BASE_URL }}
+    # - name: Debug BASE_URL
+    #   run: |
+    #     echo "BASE_URL is: $base_url"
+    #     echo "BASE_URL secret: ${{ secrets.BASE_URL != '' }}"
+    #   env:
+    #     base_url: ${{ secrets.BASE_URL }}
     
-    - name: Debug Token
-      run: |
-        echo "TEST_USER_TOKEN secret: ${{ secrets.TEST_USER_TOKEN != '' }}"
+    # - name: Debug Token
+    #   run: |
+    #     echo "TEST_USER_TOKEN secret: ${{ secrets.TEST_USER_TOKEN != '' }}"
+    #   env:
+    #     test_user_token: ${{ secrets.TEST_USER_TOKEN }}
+
+    - name: Validate secrets
       env:
-        test_user_token: ${{ secrets.TEST_USER_TOKEN }}
+        BASE_URL: ${{ secrets.BASE_URL }}
+        TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
+      run: |
+        echo "BASE_URL set: ${BASE_URL:+yes}"
+        echo "TEST_USER_TOKEN set: ${TEST_USER_TOKEN:+yes}"
+        if [ -z "$BASE_URL" ] || [ -z "$TEST_USER_TOKEN" ]; then
+          echo "ERROR: Please set repository secrets BASE_URL and TEST_USER_TOKEN"; exit 1
+        fi
 
     - name: Run tests with Allure
       env:
-        base_url: ${{ secrets.BASE_URL }}
-        test_user_token: ${{ secrets.TEST_USER_TOKEN }}
+        # provide both uppercase & lowercase to match tests
+        BASE_URL: ${{ secrets.BASE_URL }}
+        TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
       run: python3 -m pytest --alluredir=./allure-results -n auto --tb=short
 
     # - name: Generate Allure Report
