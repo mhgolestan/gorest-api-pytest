@@ -9,6 +9,7 @@ pytest_plugins = (
     'utils.fixtures.users',
     'utils.fixtures.posts',
     'utils.fixtures.todos',
+    'utils.fixtures.authentication',
 )
 
 # Global flag to track if we should use mocking
