@@ -4,7 +4,7 @@ from settings import base_settings
 
 
 class AuthUser(BaseModel):
-    token: str | None = Field(default=base_settings.test_user_token)
+    token: str | None = Field(default_factory=lambda: base_settings.test_user_token)
 
 
 
