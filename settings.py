@@ -1,5 +1,4 @@
 import os
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,11 +10,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env' if os.path.exists('.env') else None,
         env_file_encoding='utf-8',
-        case_sensitive=False
+        case_sensitive=False,
+        extra='ignore'
     )
 
-    base_url: str = Field(default=os.getenv('BASE_URL', ''))
-    test_user_token: str = Field(default=os.getenv('TEST_USER_TOKEN', ''))
+    base_url: str = ""
+    test_user_token: str = ""
 
     @property
     def api_url(self) -> str:
