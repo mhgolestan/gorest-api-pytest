@@ -1,3 +1,4 @@
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -7,13 +8,13 @@ class TestUser(BaseSettings):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='.env' if __import__('os').path.exists('.env') else None,
+        env_file='.env' if os.path.exists('.env') else None,
         env_file_encoding='utf-8',
         case_sensitive=False
     )
 
-    base_url: str
-    test_user_token: str
+    base_url: str = ""
+    test_user_token: str = ""
 
     @property
     def api_url(self) -> str:
