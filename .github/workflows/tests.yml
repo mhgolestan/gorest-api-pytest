@@ -40,7 +40,7 @@ jobs:
       env:
         base_url: ${{ secrets.BASE_URL }}
         test_user_token: ${{ secrets.TEST_USER_TOKEN }}
-      run: python3 -m pytest --alluredir=./allure-results -v
+      run: python3 -m pytest --alluredir=./allure-results -n auto --tb=short
 
     # - name: Generate Allure Report
     #   if: always()
