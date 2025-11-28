@@ -1,4 +1,5 @@
 import os
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,8 +14,8 @@ class Settings(BaseSettings):
         case_sensitive=False
     )
 
-    base_url: str = ""
-    test_user_token: str = ""
+    base_url: str = Field(default="")
+    test_user_token: str = Field(default="")
 
     @property
     def api_url(self) -> str:
