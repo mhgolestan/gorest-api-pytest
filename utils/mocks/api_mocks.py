@@ -3,6 +3,7 @@ Mock API responses for CI environments where the real API is blocked by Cloudfla
 """
 import json
 import re
+from urllib.parse import urlparse, parse_qs
 import httpx
 import respx
 from settings import base_settings
@@ -10,6 +11,41 @@ from settings import base_settings
 
 # Track deleted user IDs for proper 404 responses after deletion
 _deleted_user_ids: set[str] = set()
+
+# Valid token for authentication (matches the one from settings)
+_VALID_TOKEN = base_settings.test_user_token
+_INVALID_TOKEN_PREFIX = "invalid_token"
+
+
+def _is_authenticated(request: httpx.Request) -> bool:
+    """Check if request has valid authentication."""
+    # Check Bearer token in Authorization header
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        token = auth_header[7:]  # Remove "Bearer " prefix
+        if token.startswith(_INVALID_TOKEN_PREFIX) or token == "":
+            return False
+        return True
+    
+    # Check access_token in query params using proper URL parsing
+    parsed_url = urlparse(str(request.url))
+    query_params = parse_qs(parsed_url.query)
+    
+    if "access_token" in query_params:
+        tokens = query_params["access_token"]
+        if tokens:
+            token = tokens[0]
+            if token.startswith(_INVALID_TOKEN_PREFIX) or token == "":
+                return False
+            return True
+    
+    # No auth provided
+    return False
+
+
+def _unauthorized_response() -> httpx.Response:
+    """Return 401 Unauthorized response."""
+    return httpx.Response(401, json={"message": "Authentication failed"})
 
 
 def reset_deleted_users() -> None:
@@ -143,6 +179,10 @@ def _mock_get_user(request: httpx.Request) -> httpx.Response:
 
 def _mock_create_user(request: httpx.Request) -> httpx.Response:
     """Mock user creation with validation."""
+    # Check authentication for write operations
+    if not _is_authenticated(request):
+        return _unauthorized_response()
+    
     try:
         data = json.loads(request.content)
     except (json.JSONDecodeError, TypeError):
@@ -171,6 +211,10 @@ def _mock_create_user(request: httpx.Request) -> httpx.Response:
 
 def _mock_update_user(request: httpx.Request) -> httpx.Response:
     """Mock user update with proper handling."""
+    # Check authentication for write operations
+    if not _is_authenticated(request):
+        return _unauthorized_response()
+    
     user_id = _extract_user_id(str(request.url))
     
     # Check if user was deleted
@@ -201,6 +245,10 @@ def _mock_update_user(request: httpx.Request) -> httpx.Response:
 
 def _mock_delete_user(request: httpx.Request) -> httpx.Response:
     """Mock user deletion with proper handling."""
+    # Check authentication for write operations
+    if not _is_authenticated(request):
+        return _unauthorized_response()
+    
     global _deleted_user_ids
     user_id = _extract_user_id(str(request.url))
     
@@ -219,6 +267,10 @@ def _mock_delete_user(request: httpx.Request) -> httpx.Response:
 
 def _mock_create_post(request: httpx.Request) -> httpx.Response:
     """Mock post creation with validation."""
+    # Check authentication for write operations
+    if not _is_authenticated(request):
+        return _unauthorized_response()
+    
     try:
         data = json.loads(request.content)
     except (json.JSONDecodeError, TypeError):
@@ -238,6 +290,10 @@ def _mock_create_post(request: httpx.Request) -> httpx.Response:
 
 def _mock_create_todo(request: httpx.Request) -> httpx.Response:
     """Mock todo creation with validation."""
+    # Check authentication for write operations
+    if not _is_authenticated(request):
+        return _unauthorized_response()
+    
     try:
         data = json.loads(request.content)
     except (json.JSONDecodeError, TypeError):
