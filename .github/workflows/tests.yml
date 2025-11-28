@@ -36,6 +36,12 @@ jobs:
           echo "ERROR: Please set repository secrets BASE_URL and TEST_USER_TOKEN"; exit 1
         fi
 
+    - name: Debug Python Settings
+      env:
+        BASE_URL: ${{ secrets.BASE_URL }}
+        TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
+      run: python3 -c "from settings import base_settings; print('base_url:', repr(base_settings.base_url)); print('token_len:', len(base_settings.test_user_token)); print('api_url:', repr(base_settings.api_url))"
+
     - name: Run tests with Allure
       env:
         BASE_URL: ${{ secrets.BASE_URL }}
