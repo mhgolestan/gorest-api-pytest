@@ -23,18 +23,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Validate secrets
-      env:
-        BASE_URL: ${{ secrets.BASE_URL }}
-        TEST_USER_TOKEN: ${{ secrets.TEST_USER_TOKEN }}
-      run: |
-        echo "BASE_URL set: ${BASE_URL:+yes}"
-        echo "TEST_USER_TOKEN set: ${TEST_USER_TOKEN:+yes}"
-        if [ -z "$BASE_URL" ] || [ -z "$TEST_USER_TOKEN" ]; then
-          echo "ERROR: Please set repository secrets BASE_URL and TEST_USER_TOKEN"
-          exit 1
-        fi
-
     - name: Run tests with Allure
       env:
         BASE_URL: ${{ secrets.BASE_URL }}
@@ -42,25 +30,25 @@ jobs:
         CI: true
       run: python3 -m pytest --alluredir=./allure-results -v
 
-    # - name: Generate Allure Report
-    #   if: always()
-    #   uses: simple-elf/allure-report-action@master
-    #   with:
-    #     allure_results: allure-results
-    #     gh_pages: gh-pages
-    #     allure_history: allure-history
+    - name: Generate Allure Report
+      if: always()
+      uses: simple-elf/allure-report-action@master
+      with:
+        allure_results: allure-results
+        gh_pages: gh-pages
+        allure_history: allure-history
 
-    # - name: Deploy report to GitHub Pages
-    #   if: always()
-    #   uses: peaceiris/actions-gh-pages@v4
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     publish_dir: allure-report
+    - name: Deploy report to GitHub Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: allure-report
 
-    # - name: Upload Allure Report as Artifact
-    #   if: always()
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: allure-report
-    #     path: allure-report
-    #     retention-days: 30
+    - name: Upload Allure Report as Artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-report
+        path: allure-report
+        retention-days: 30
