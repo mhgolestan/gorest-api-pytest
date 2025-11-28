@@ -37,4 +37,5 @@ class UsersClient(APIClient):
     def create_user(self) -> DefaultUser:
         payload = DefaultUser()
         response = self.create_user_api(payload)
+        response.raise_for_status()
         return DefaultUser(**response.json())
