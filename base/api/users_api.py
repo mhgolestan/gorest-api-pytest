@@ -17,7 +17,6 @@ class UsersClient(APIClient):
 
     @allure.step('Creating user')
     def create_user_api(self, payload: DefaultUser) -> Response:
-        print("APIRoutes.USERS", APIRoutes.USERS)
         return self.client.post(APIRoutes.USERS, json=payload.model_dump(by_alias=True))
     
     @allure.step('Creating user with raw payload')
@@ -37,7 +36,6 @@ class UsersClient(APIClient):
 
     def create_user(self) -> DefaultUser:
         payload = DefaultUser()
-        print("def create_user(self)", payload)
         response = self.create_user_api(payload)
         response.raise_for_status()
         return DefaultUser(**response.json())
